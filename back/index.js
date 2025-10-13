@@ -10,7 +10,8 @@ const PORT = 4000;
 app.use(express.json());
 app.use(cors());
 
-// 4. GET route – kai norime gauti duomenis
+// 4. GET route – kai norime gauti duomenis,turetu grazinti
+// toki objiekta ko tikisi frotnendas
 app.get("/", (req, res) => {
   res.send("Sveiki atvykę į mano Express serverį!");
 });
