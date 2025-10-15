@@ -12,37 +12,39 @@ app.use(cors());
 
 // 4. GET route – kai norime gauti duomenis,turetu grazinti
 // toki objiekta ko tikisi frotnendas
-app.get("/", (req, res) => {
-  res.send("Sveiki atvykę į mano Express serverį!");
+let mineralai = [
+  { id: 1, title: "Kalkakmenis", description: "Svarbus akmuo statybose." },
+  { id: 2, title: "Klinčių karjeras", description: "Istorinis karjeras." },
+];
+app.get("/mineralai", (req, res) => {
+  res.json(mineralai);
 });
 
 // 5. POST route – kai norime siųsti duomenis į serverį
-app.post("/duomenys", (req, res) => {
-  const gautiDuomenys = req.body; // duomenys, atėję su užklausa
-  console.log("Gavome:", gautiDuomenys);
-
-  res.send("Duomenys sėkmingai gauti");
+app.post("/mineralai", (req, res) => {
+  const { title, description } = req.body;
+  const id = mineralai.length ? mineralai[mineralai.length - 1].id + 1 : 1;
+  const naujas = { id, title, description };
+  mineralai.push(naujas);
+  res.json(naujas);
 });
 
-const ratings = {};
-
-app.get("/api/ratings", (req, res) => {
-  res.json(ratings);
+app.put("/mineralai/:id", (req, res) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+  const mineralas = mineralai.find((m) => m.id === parseInt(id));
+  if (!mineralas) return res.status(404).json({ error: "Nerastas" });
+  mineralas.title = title ?? mineralas.title;
+  mineralas.description = description ?? mineralas.description;
+  res.json(mineralas);
 });
 
-app.post("/api/ratings", (req, res) => {
-  const { itemId, value } = req.body;
-  if (!itemId || !["like", "dislike"].includes(value)) {
-    return res.status(400).json({ error: "Neteisinga uzklausos forma" });
-  }
-  if (!ratings[itemId]) {
-    ratings[itemId] = { like: 0, dislike: 0 };
-  }
-
-  ratings[itemId][value] += 1;
-  console.log(`✅ ${itemId} gavo ${value}!`);
-  res.json({ itemId, counts: ratings[itemId] });
+app.delete("/mineralai/:id", (req, res) => {
+  const { id } = req.params;
+  mineralai = mineralai.filter((m) => m.id !== parseInt(id));
+  res.json({ message: "Ištrinta" });
 });
+
 // 6. Paleidžiame serverį
 app.listen(PORT, () => {
   console.log(`Serveris veikia http://localhost:${PORT}`);
