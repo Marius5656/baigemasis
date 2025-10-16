@@ -22,7 +22,16 @@ app.get("/mineralai", (req, res) => {
 
 // 5. POST route – kai norime siųsti duomenis į serverį
 app.post("/mineralai", (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ error: "Body cannot be empty" });
+  }
   const { title, description } = req.body;
+  if (!title || !description) {
+    return res
+      .status(400)
+      .json({ error: "Both title and description are required" });
+  }
+
   const id = mineralai.length ? mineralai[mineralai.length - 1].id + 1 : 1;
   const naujas = { id, title, description };
   mineralai.push(naujas);
